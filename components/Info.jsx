@@ -12,18 +12,31 @@ import Image from "next/image";
 
 export default function PlayerInfoPanel({ history, player, onClose, ingredients, achievements }) { // [NEW] Accept achievements prop
   const [ currentTab, setCurrentTab ] = useState(0)
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (player) {
+      setLoading(true);
+      fetchUserCollection(player).then(data => {
+        setRecipes(data);
+        setLoading(false);
+      });
+    }
+  }, [player]);
+
   const tabs = [
     {
       id: 0,
-      name: "คอลเล็กชั่น"
+      name: `คอลเล็กชั่น (${recipes.length})`
     },
     {
       id: 1,
-      name: "วัตถุดิบที่สร้าง"
+      name: `วัตถุดิบที่สร้าง (${ingredients.length})`
     },
     {
       id: 2,
-      name: "ความสำเร็จ"
+      name: `ความสำเร็จ (${achievements.length})`
     }
   ]
   return (
@@ -74,10 +87,10 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
         </div>
         {/* Content */}
         {
-          currentTab == 0 ? <CollectionContent player={player} /> : 
+          currentTab == 0 ? <CollectionContent player={player} recipes={recipes} loading={loading} /> : 
           currentTab == 1 ? <MaterialContent ingredients={ingredients} player={player} /> :  
           currentTab == 2 ? <AchievementContent achievements={achievements} /> : 
-          <CollectionContent player={player} />
+          <CollectionContent player={player} recipes={recipes} loading={loading} />
         }
       </motion.div>
     </div>
@@ -85,22 +98,14 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
 }
 
 
-function CollectionContent({ player }) {
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
+function CollectionContent({ player, recipes, loading }) {
+  
+  
   const [currentSelected, setCurrentSelected] = useState(null);
 
   const [mobileTab, setMobileTab] = useState(0)
 
-  useEffect(() => {
-    if (player) {
-      setLoading(true);
-      fetchUserCollection(player).then(data => {
-        setRecipes(data);
-        setLoading(false);
-      });
-    }
-  }, [player]);
+  
 
   if (loading) {
     return <div className="p-4! border-b-4 border-x-4 border-[#b6562c]/50 h-full flex items-center justify-center text-center text-[#b6562c]">กำลังโหลด...</div>;
