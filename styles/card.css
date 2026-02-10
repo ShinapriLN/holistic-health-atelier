@@ -1,0 +1,22 @@
+.card {
+    /* ใช้พื้นหลังเป็นรูปกรอบ (Mask) */
+    background-image: url("/mask.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+/* .card::after {
+    content: "";
+    background-image: url("/mask.png");
+    background-size: 100% 100%;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    z-index: -1;
+    pointer-events: none;
+} */
