@@ -47,18 +47,18 @@ export default function RecipeResult({
                 className="flex gap-4 items-start  border-2 border-[#b6562c]/50 p-4!
                            transition-transform duration-200" 
               >
-                <span className="text-3xl">
+                <div className="text-3xl ">
                   <Image 
                     src={item.image_url} 
                     alt={item.name}
-                    width={72} 
-                    height={72} 
+                    width={300} 
+                    height={300} 
                     className="w-18 object-contain" 
                   />
-                </span>
-                <div className="flex flex-col gap-1">
+                </div>
+                <div className="flex flex-col gap-1 flex-1">
                   <span className="text-[#b6562c] font-bold">{item.name}</span>
-                  <span className="text-[#b6562c] text-sm leading-relaxed">
+                  <span className="text-[#b6562c] text-sm text-wrap leading-relaxed">
                     {item.benefit}
                   </span>
                 </div>
