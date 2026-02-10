@@ -10,6 +10,7 @@ const nextConfig = {
         pathname: "/storage/v1/object/public/**",
       },
     ],
+    minimumCacheTTL: 3153600000,
   },
 };
 
