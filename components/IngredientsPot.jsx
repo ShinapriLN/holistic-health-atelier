@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import { BiSolidFoodMenu } from "react-icons/bi";
 import { IoIosClose, IoMdSearch } from "react-icons/io";
 import { GrAppsRounded } from "react-icons/gr";
+import Image from "next/image";
 
 
 export default function IngredientsPot({
@@ -264,8 +265,8 @@ export default function IngredientsPot({
                   ${currentCategory == cate.name ? "" : "opacity-40 scale-90"} 
                 `}
               >
-                <div className="p-2!">
-                  <img src={cate.image_url} alt={cate.name} />
+                <div className="p-2! relative w-full h-full flex items-center justify-center">
+                  <Image src={cate.image_url} alt={cate.name} width={32} height={32} className="object-contain" />
                 </div>
               </motion.button>
             ))}
@@ -303,7 +304,7 @@ export default function IngredientsPot({
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">วัตถุดิบ<span className="text-[#b6562c]/50 mx-1">{currentCategory != "all" ? "│" : ""}</span>{currentCategory == "all" ? "" : currentCategory}</span>
+                  <span className="font-bold">วัตถุดิบ<span className="text-[#b6562c]/50 mx-1!">{currentCategory != "all" ? "│" : ""}</span>{currentCategory == "all" ? "" : currentCategory}</span>
                   <motion.button 
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -394,9 +395,9 @@ export default function IngredientsPot({
                             hover: { scale: 1.1 },
                             tap: { scale: 0.95 }
                           }}
-                          className="w-8 md:w-12"
+                          className="w-8 md:w-12 flex justify-center"
                         >
-                          <img src={ing.image_url} alt={ing.name} />
+                          <Image src={ing.image_url} alt={ing.name} width={48} height={48} className="object-contain" />
                         </motion.div>
                         <span className="text-[#b6562c] text-xs md:text-lg">
                           {ing.name.length > 15
@@ -424,7 +425,7 @@ export default function IngredientsPot({
                           <button 
                             onClick={() => removeFromPot(ing.id)}
                             key={ing.id} className="text-sm shrink-0">
-                            <img src={ing.image_url} className="h-8" />
+                            <Image src={ing.image_url} alt={ing.name} width={32} height={32} className="h-8 w-auto object-contain" />
                           </button>
                         ))
                       }
@@ -509,7 +510,7 @@ export default function IngredientsPot({
               <IoIosClose />
             </motion.button>
             <div className="flex flex-col items-center gap-2 flex-1 justify-between">
-              <img src={"/cooking.gif"} className="h-20 rounded-2xl" />
+              <Image src={"/cooking.gif"} alt="Cooking" width={80} height={80} className="h-20 w-auto rounded-2xl" unoptimized />
               <h3 className="text-[#b6562c] m-0 text-[14px]">
                 วัตถุดิบที่ใส่ ({potIngredientsConf.get.length})
               </h3>
@@ -520,8 +521,8 @@ export default function IngredientsPot({
           <div className=" flex flex-1 overflow-auto flex-col gap-4 justify-between p-2! md:p-4!">
             <div className="grid grid-cols-3 gap-1 md:gap-3 ">
               {potIngredientsConf.get.map((ing) => (
-                <div key={ing.id} className="justify-self-center md:w-full">
                   <button
+                    key={ing.id}
                     onClick={() => removeFromPot(ing.id)}
                     className="
                             px-3! py-1! text-xs md:text-sm
@@ -529,12 +530,13 @@ export default function IngredientsPot({
                             text-[#b6562c] cursor-pointer flex flex-col gap-2! bg-[#b6562c]/10
                           "
                   >
-                    <img src={ing.image_url} />
+                    <div className="flex justify-center">
+                      <Image src={ing.image_url} alt={ing.name} width={48} height={48} className="object-contain h-10 w-auto" />
+                    </div>
                     {ing.name.length > 10
                       ? ing.name.slice(0, 10) + "..."
                       : ing.name}
                   </button>
-                </div>
               ))}
             </div>
           </div>
@@ -574,7 +576,7 @@ export default function IngredientsPot({
               opacity: pos.opacity,
             }}
           >
-            <img src={item.ingredient.image_url} className="h-12" />
+            <Image src={item.ingredient.image_url} alt={item.ingredient.name} width={48} height={48} className="h-12 w-auto object-contain" />
           </div>
         );
       })}

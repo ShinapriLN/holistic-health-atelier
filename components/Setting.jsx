@@ -20,7 +20,7 @@ export default function SettingPanel({ onClose, bgm, video }) {
                       shadow-[0_0_60px_rgba(139,105,20,0.4)] animate-in slide-in-from-bottom-4 duration-75`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6!">
           <h2 className="text-[#b6562c] font-bold text-2xl">⚙️ ตั้งค่า</h2>
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -36,7 +36,7 @@ export default function SettingPanel({ onClose, bgm, video }) {
 
         {/* Audio Section */}
         <div className="flex flex-col gap-5">
-          <h3 className="text-[#b6562c]/80 font-semibold text-lg border-b border-[#b6562c]/20 pb-2">
+          <h3 className="text-[#b6562c]/80 font-semibold text-lg border-b border-[#b6562c]/20 pb-2!">
             🎵 เสียง
           </h3>
 
@@ -110,8 +110,8 @@ export default function SettingPanel({ onClose, bgm, video }) {
         </div>
 
         {/* Video Section */}
-        <div className="flex flex-col gap-5 mt-6">
-          <h3 className="text-[#b6562c]/80 font-semibold text-lg border-b border-[#b6562c]/20 pb-2">
+        <div className="flex flex-col gap-5 mt-6!">
+          <h3 className="text-[#b6562c]/80 font-semibold text-lg border-b border-[#b6562c]/20 pb-2!">
             🎬 วิดีโอ
           </h3>
 

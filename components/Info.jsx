@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { ACHIEVEMENTS } from "@/lib/constants";
 import { fetchUserCollection } from "@/lib/supabase";
 import { isMobile } from "pixi.js";
+import Image from "next/image";
 
 
 export default function PlayerInfoPanel({ history, player, onClose, ingredients, achievements }) { // [NEW] Accept achievements prop
@@ -166,7 +167,13 @@ function CollectionContent({ player }) {
                 recipes[currentSelected].ingredients.map((ing, index) => (
                   <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
                     <div className=" w-fit p-2!">
-                      <img src={ing.image_url} className="h-12" />
+                      <Image 
+                        src={ing.image_url} 
+                        alt={ing.name}
+                        width={48} 
+                        height={48} 
+                        className="h-12 w-12 object-contain" 
+                      />
                     </div>
                     <div  className=" w-fit">
                       <span key={ing.id}>{ing.name}</span>
@@ -226,9 +233,12 @@ function CollectionContent({ player }) {
                 {
                   (mobileTab === "รูปภาพ") ? (
                     <div className="w-full h-full p-2! overflow-y-auto flex items-center justify-center">
-                      <img 
+                      <Image 
                         src={recipes[currentSelected].image_url} 
-                        className="max-h-64 object-contain rounded-lg border-2 border-[#b6562c]/30"
+                        alt={recipes[currentSelected].name}
+                        width={400} 
+                        height={400}
+                        className="max-h-64 rounded-lg border-2 border-[#b6562c]/30 object-cover object-center"
                       />
                     </div>
                   ) :
@@ -238,7 +248,13 @@ function CollectionContent({ player }) {
                       recipes[currentSelected].ingredients.map((ing, index) => (
                         <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
                           <div className=" w-fit p-2!">
-                            <img src={ing.image_url} className="h-12" />
+                            <Image 
+                              src={ing.image_url} 
+                              alt={ing.name}
+                              width={48} 
+                              height={48} 
+                              className="h-12 w-12 object-contain" 
+                            />
                           </div>
                           <div  className=" w-fit">
                             <span key={ing.id}>{ing.name}</span>
@@ -298,7 +314,13 @@ function MaterialContent({ ingredients, player }) {
             text-[#b6562c]
           "
         >
-          <img src={ing.image_url} alt={ing.name} className="h-12 w-12 object-contain" />
+          <Image 
+            src={ing.image_url} 
+            alt={ing.name} 
+            width={48} 
+            height={48} 
+            className="h-12 w-12 object-contain" 
+          />
           <span className="text-sm font-semibold">{ing.name}</span>
         </div>
       ))}

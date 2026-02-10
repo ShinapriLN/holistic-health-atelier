@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react"
+import Image from "next/image";
 
 export default function RecipeResult({
   recipe,
@@ -47,7 +48,13 @@ export default function RecipeResult({
                            transition-transform duration-200" 
               >
                 <span className="text-3xl">
-                  <img src={item.image_url} className="w-18" />
+                  <Image 
+                    src={item.image_url} 
+                    alt={item.name}
+                    width={72} 
+                    height={72} 
+                    className="w-18 object-contain" 
+                  />
                 </span>
                 <div className="flex flex-col gap-1">
                   <span className="text-[#b6562c] font-bold">{item.name}</span>

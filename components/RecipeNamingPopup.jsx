@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 
 export default function RecipeNamingPopup({ ingredients, onSubmit, onCancel }) {
   const [name, setName] = useState("");
@@ -61,7 +62,7 @@ export default function RecipeNamingPopup({ ingredients, onSubmit, onCancel }) {
             {ingredients.map((ing) => (
               <span key={ing.id} className="bg- border border-amber-900/50 flex gap-2 items-center justify-center
                                              py-1.5! px-3! text-[#b6562c] text-sm">
-                <img src={ing.image_url} className="h-4" /> {ing.name}
+                <Image src={ing.image_url} alt={ing.name} width={16} height={16} className="h-4 w-4 object-contain" /> {ing.name}
               </span>
             ))}
           </div>
@@ -114,11 +115,13 @@ export default function RecipeNamingPopup({ ingredients, onSubmit, onCancel }) {
               <div className="flex flex-col gap-2">
                 <label className="text-[#b6562c] text-sm font-medium">📷 รูปภาพอาหาร:</label>
                 {imagePreview ? (
-                  <div className="relative">
-                    <img
+                  <div className="relative w-full h-40">
+                    <Image
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-40 object-cover border-2 border-[#b6562c]/30"
+                      fill
+                      className="object-cover border-2 border-[#b6562c]/30"
+                      unoptimized
                     />
                     <button
                       type="button"

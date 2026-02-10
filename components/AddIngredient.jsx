@@ -3,6 +3,7 @@
 import { IoIosClose } from "react-icons/io";
 import { motion } from "motion/react";
 import { useState } from "react";
+import Image from "next/image";
 import { CATEGORIES } from "@/lib/constants";
 import { uploadImage } from "@/lib/supabase";
 
@@ -195,8 +196,14 @@ export default function AddIngredientPopup({ onClose, onAdd }) {
 
             {/* Preview */}
             {(previewUrl && (imageMode === 'upload' ? selectedFile : formData.image_url)) && (
-                <div className="mt-2! flex justify-center border-2 border-dashed border-[#b6562c]/30 p-2 rounded-lg">
-                    <img src={previewUrl} alt="Preview" className="h-32 object-contain" />
+                <div className="mt-2! flex justify-center border-2 border-dashed border-[#b6562c]/30 p-2 rounded-lg relative h-32 w-full">
+                    <Image 
+                      src={previewUrl} 
+                      alt="Preview" 
+                      fill
+                      className="object-contain" 
+                      unoptimized={previewUrl.startsWith('blob:')}
+                    />
                 </div>
             )}
 
