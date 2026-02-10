@@ -164,7 +164,7 @@ export default function RecipeNamingPopup({ ingredients, onSubmit, onCancel }) {
                   rows={3}
                   className="bg-white/40 border-2 border-[#b6562c]/50 py-3! px-4! text-sm 
                              text-[#b6562c] transition-all duration-300 resize-none
-                             placeholder:text-amber-700/50
+                             placeholder:text-amber-700/50 selection:text-white!
                              focus:outline-none focus:border-[#b6562c]/80 focus:shadow-[0_0_20px_rgba(139,105,20,0.3)]"
                 />
                 <span className="text-[#b6562c]/50 text-xs text-right">{description.length}/1000</span>

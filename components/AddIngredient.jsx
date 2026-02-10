@@ -137,7 +137,7 @@ export default function AddIngredientPopup({ onClose, onAdd }) {
               onChange={(e) =>
                 setFormData({ ...formData, benefit: e.target.value })
               }
-              className="p-2! border-2 border-[#b6562c]/50 bg-[#b6562c]/10 text-[#b6562c] outline-none focus:border-[#b6562c] min-h-20"
+              className="p-2! border-2 border-[#b6562c]/50 bg-[#b6562c]/10 text-[#b6562c] outline-none focus:border-[#b6562c] min-h-20 selection:text-white!"
             />
           </div>
 
