@@ -7,6 +7,8 @@ import {
   createRecipe,
   addIngredient,
   addToCollection,
+  fetchUserCollection,
+  fetchRecipesByCreator, // [NEW] Import
   uploadPresetData,
   uploadRecipeImage,
   getPresetData,
@@ -51,8 +53,19 @@ export default function Home() {
     "achievements",
     [],
   );
+  // [NEW] Tracking stats for advanced achievements
+  const [playerStats, setPlayerStats, statsLoaded] = useLocalStorage("playerStats", {
+    ingredientsContributed: 0,
+    detailsAdded: 0,
+    firstDiscoveries: 0,
+  });
+
+  // [NEW] Full collection for achievements (replaces history for counts)
+  const [userCollection, setUserCollection] = useState([]);
+  const [collectionLoaded, setCollectionLoaded] = useState(false);
 
   const [currentAchievement, setCurrentAchievement] = useState(null);
+  const [achievementQueue, setAchievementQueue] = useState([]); // [NEW] Queue for multiple unlocks
 
   // BGM
   const { unmute, tryAutoplayUnmuted, volume, setVolume, isMuted, toggleMute } = useBGM("/bgm/bgm.mp3");
@@ -101,6 +114,12 @@ export default function Home() {
   useEffect(() => {
     if (nameLoaded && playerName) {
       tryAutoplayUnmuted();
+      
+      // [NEW] Fetch full collection
+      fetchUserCollection(playerName).then(data => {
+        setUserCollection(data);
+        setCollectionLoaded(true);
+      });
     }
   }, [nameLoaded, playerName, tryAutoplayUnmuted]);
 
@@ -128,61 +147,167 @@ export default function Home() {
   }, []);
 
   // [NEW] Helper: Unlock Achievement
-  const unlockAchievement = useCallback(
-    (id, dynamicData = null) => {
+  // Check if an achievement is unlocked
+  const isUnlocked = useCallback((id) => {
+    return achievements.some((a) =>
+      typeof a === "string" ? a === id : a.id === id,
+    );
+  }, [achievements]);
+
+  // [MODIFIED] Batch unlock achievements to prevent localStorage race conditions
+  const batchUnlockAchievements = useCallback(
+    (idsOrData) => {
       if (!achievementsLoaded) return;
 
-      // Check if already unlocked
-      const isUnlocked = achievements.some((a) =>
-        typeof a === "string" ? a === id : a.id === id,
-      );
-      if (isUnlocked) return;
+      const newAchievements = [];
+      
+      idsOrData.forEach(item => {
+        const id = typeof item === 'string' ? item : item.id;
+        if (isUnlocked(id)) return;
 
-      let newAchievement = null;
-
-      if (dynamicData) {
-        // Dynamic achievement
-        newAchievement = {
-          id,
-          ...dynamicData,
-          unlockedAt: new Date().toISOString(),
-        };
-      } else {
-        // Static achievement from constants
-        const staticData = ACHIEVEMENTS.find((a) => a.id === id);
-        if (staticData) {
-          newAchievement = {
-            ...staticData,
-            unlockedAt: new Date().toISOString(),
-          };
+        let newAchievement = null;
+        if (typeof item === 'object') {
+           newAchievement = {
+              ...item,
+              unlockedAt: new Date().toISOString(),
+           };
+        } else {
+           const staticData = ACHIEVEMENTS.find((a) => a.id === item);
+           if (staticData) {
+             newAchievement = {
+               ...staticData,
+               unlockedAt: new Date().toISOString(),
+             };
+           }
         }
-      }
 
-      if (newAchievement) {
-        setAchievements((prev) => [...prev, newAchievement]);
-        setCurrentAchievement(newAchievement);
+        if (newAchievement) {
+            newAchievements.push(newAchievement);
+        }
+      });
+
+      if (newAchievements.length > 0) {
+        setAchievements((prev) => [...prev, ...newAchievements]);
+        setAchievementQueue((prev) => [...prev, ...newAchievements]);
       }
     },
-    [achievementsLoaded, achievements, setAchievements],
+    [achievementsLoaded, isUnlocked, setAchievements],
   );
+
+  // [NEW] Process Achievement Queue
+  useEffect(() => {
+    if (!currentAchievement && achievementQueue.length > 0) {
+      // Add delay to ensure valid exit animation and "breathing room"
+      const timer = setTimeout(() => {
+        const next = achievementQueue[0];
+        setCurrentAchievement(next);
+        setAchievementQueue((prev) => prev.slice(1));
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentAchievement, achievementQueue]);
+
+  // [NEW] Achievement System: Check conditions
+  const checkAchievements = useCallback((currentStats = {}, currentCollection = []) => {
+    const toUnlock = [];
+
+    // 1. Found N Recipes (found_*)
+    // Use the full DB collection count instead of limited history
+    const uniqueFound = (currentCollection.length > 0 ? currentCollection : userCollection).length;
+    
+    if (uniqueFound >= 10) toUnlock.push("found_10");
+    if (uniqueFound >= 50) toUnlock.push("found_50");
+    if (uniqueFound >= 100) toUnlock.push("found_100");
+    if (uniqueFound >= 500) toUnlock.push("found_500");
+
+    // 2. First Discoveries (new_*)
+    const discoverCount = currentStats.firstDiscoveries ?? playerStats.firstDiscoveries;
+    if (discoverCount >= 10) toUnlock.push("new_10");
+    if (discoverCount >= 50) toUnlock.push("new_50");
+    if (discoverCount >= 100) toUnlock.push("new_100");
+    if (discoverCount >= 200) toUnlock.push("new_200");
+
+    // 3. Contribution (contributed_*)
+    const contribCount = currentStats.ingredientsContributed ?? playerStats.ingredientsContributed;
+    if (contribCount >= 10) toUnlock.push("contributed_1");
+    if (contribCount >= 50) toUnlock.push("contributed_2");
+    if (contribCount >= 100) toUnlock.push("contributed_3");
+    if (contribCount >= 200) toUnlock.push("contributed_4");
+
+    // 4. Detailer (detailer_*)
+    const detailCount = currentStats.detailsAdded ?? playerStats.detailsAdded;
+    if (detailCount >= 1) toUnlock.push("detailer_1");
+    if (detailCount >= 10) toUnlock.push("detailer_2");
+    if (detailCount >= 50) toUnlock.push("detailer_3");
+    if (detailCount >= 100) toUnlock.push("detailer_4");
+
+    // [NEW] Retroactive "Lost One" (Welcome)
+    // If player has done anything, ensure they have the welcome achievement
+    if (uniqueFound > 0 || discoverCount > 0 || contribCount > 0 || detailCount > 0) {
+        toUnlock.push("lost_one");
+    }
+
+    if (toUnlock.length > 0) {
+        batchUnlockAchievements(toUnlock);
+    }
+
+  }, [history, playerStats, userCollection, batchUnlockAchievements]); // Added batchUnlockAchievements dependency
+
+  // Check achievement count whenever achievements change
+  useEffect(() => {
+    if (!achievementsLoaded) return;
+    const count = achievements.length;
+    const toUnlock = [];
+    if (count >= 5) toUnlock.push("achievement_1");
+    if (count >= 20) toUnlock.push("achievement_2");
+    if (count >= 50) toUnlock.push("achievement_3");
+    if (count >= 100) toUnlock.push("achievement_4");
+    
+    if (toUnlock.length > 0) batchUnlockAchievements(toUnlock);
+  }, [achievements, achievementsLoaded, batchUnlockAchievements]);
 
   // [NEW] Achievement Check: The Lost One
   // [NEW] Achievement Check: The Lost One & Migration
 
-  // [NEW] Load initial ingredients
+  // [NEW] Load initial ingredients & Retroactive Stats Check
   useEffect(() => {
     fetchIngredients().then((data) => {
       setIngredients(data);
       setDataLoading(false);
+
+      if (playerName && achievementsLoaded) {
+        // 1. Count contributed ingredients
+        const myIngredients = data.filter(i => i.by === playerName).length;
+        
+        // 2. Count created recipes (first discoveries & details)
+        fetchRecipesByCreator(playerName).then(myRecipes => {
+            const myDiscoveries = myRecipes.length;
+            const myDetails = myRecipes.filter(r => r.description || r.image_url).length;
+
+            setPlayerStats(prev => {
+                const newStats = {
+                    ...prev,
+                    ingredientsContributed: Math.max(prev.ingredientsContributed || 0, myIngredients),
+                    firstDiscoveries: Math.max(prev.firstDiscoveries || 0, myDiscoveries),
+                    detailsAdded: Math.max(prev.detailsAdded || 0, myDetails)
+                };
+                
+                // Trigger check with new stats
+                checkAchievements(newStats);
+
+                return newStats;
+            });
+        });
+      }
     });
-  }, []);
+  }, [playerName, achievementsLoaded]); // Added achievementsLoaded dependency
 
   const handleNameSubmit = (name) => {
     setPlayerName(name);
     setShowNamePopup(false);
     unmute(); // Start BGM when first-time user clicks "ตกลง"
     setTimeout(() => {
-      unlockAchievement("lost_one");
+      batchUnlockAchievements(["lost_one"]);
     }, 500);
   };
 
@@ -222,19 +347,34 @@ export default function Home() {
 
         // [NEW] Add to persistent collection
         addToCollection(playerName, newRecipe.id);
+        
+        // Update local collection state immediately
+        const updatedCollection = [...userCollection, newRecipe];
+        setUserCollection(updatedCollection);
 
         // [NEW] Achievement Check: First Discovery
         // [NEW] Dynamic Achievement: Recipe Discovery
         // Always award a "Discoverer" achievement for a new recipe
         const discoveryId = `discovery-${newRecipe.id}`;
         if (achievementsLoaded) {
+          // Update stats
+          const newStats = {
+            ...playerStats,
+            firstDiscoveries: (playerStats.firstDiscoveries || 0) + 1,
+            detailsAdded: (playerStats.detailsAdded || 0) + (recipeDesc || imageUrl ? 1 : 0)
+          };
+          setPlayerStats(newStats);
+
           // Slight delay to show achievement after result popup
           setTimeout(() => {
-            unlockAchievement(`discovery-${newRecipe.id}`, {
-              name: `ผู้ค้นพบ ${newRecipe.name}`,
-              description: "คุณคือคนแรกที่ค้นพบสูตรอาหารนี้",
-              icon: "🍳",
-            });
+            batchUnlockAchievements([{
+                id: `discovery-${newRecipe.id}`,
+                name: `ผู้ค้นพบ ${newRecipe.name}`,
+                description: "คุณคือคนแรกที่ค้นพบสูตรอาหารนี้",
+                icon: "🍳",
+            }]);
+            // Check other stats
+            checkAchievements(newStats, updatedCollection);
           }, 500);
         }
       }
@@ -301,6 +441,15 @@ export default function Home() {
 
     if (result) {
       setIngredients((prev) => [...prev, result]);
+      
+      // Update stats
+      const newStats = {
+        ...playerStats,
+        ingredientsContributed: (playerStats.ingredientsContributed || 0) + 1
+      };
+      setPlayerStats(newStats);
+      checkAchievements(newStats);
+      
       return true;
     }
     return false;
@@ -413,6 +562,28 @@ export default function Home() {
             addToHistory(recipe, false, finalIngredients);
             // [NEW] Add to persistent collection
             addToCollection(playerName, recipe.id);
+            
+            // Update local collection state immediately if not exists
+            let updatedCollection = userCollection;
+            const exists = userCollection.some(r => r.id === recipe.id);
+             
+            // [NEW] Check for duplicate (cooked before) - using full collection
+            if (exists) {
+                batchUnlockAchievements(["duplicate"]);
+            } else {
+                updatedCollection = [...userCollection, recipe];
+                setUserCollection(updatedCollection);
+            }
+
+            // [NEW] Check for messy (mixed many)
+            const toUnlock = [];
+            if (finalIngredients.length > 10) toUnlock.push("messy_mixed_1"); // > 10
+            if (finalIngredients.length > 100) toUnlock.push("messy_mixed_2"); // > 100
+            
+            if (toUnlock.length > 0) batchUnlockAchievements(toUnlock);
+             
+            // Check general stats
+            checkAchievements({}, updatedCollection);
           }}
           onStir={() => stirRef.current?.()}
           projectileAnim={projectileAnim}
@@ -444,7 +615,7 @@ export default function Home() {
         />
 
         {/* Achievement Popup */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {currentAchievement && (
             <AchievementPopup
               achievement={currentAchievement}

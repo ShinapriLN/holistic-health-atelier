@@ -7,7 +7,7 @@ export default function AchievementPopup({ achievement, onClose }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 4000); // Auto close after 4 seconds
+    }, 3000); // Auto close after 4 seconds
     return () => clearTimeout(timer);
   }, [onClose]);
 
