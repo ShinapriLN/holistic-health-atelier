@@ -188,14 +188,16 @@ export default function IngredientsPot({
     return pairs;
   }, []);
 
-  // Check if an ingredient can pair with the current pot contents
+  // Check if an ingredient can pair with the current pot contents (including flying items)
   const isIngredientCompatible = (ingName) => {
     const potNames = potIngredientsConf.get.map(p => p.name);
-    if (potNames.length === 0) return true; // empty pot = all enabled
-    // For each ingredient already in the pot, check that a COMBI pair exists
-    return potNames.every(potName =>
+    const flyingNames = flyingItems.map(f => f.ingredient.name);
+    const allNames = [...potNames, ...flyingNames];
+    if (allNames.length === 0) return true; // empty pot = all enabled
+    // For each ingredient already in/heading to the pot, check that a COMBI pair exists
+    return allNames.every(name =>
       COMBI.some(([a, b]) =>
-        (a === potName && b === ingName) || (b === potName && a === ingName)
+        (a === name && b === ingName) || (b === name && a === ingName)
       )
     );
   };
