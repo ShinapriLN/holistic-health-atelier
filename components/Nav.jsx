@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { redirect, RedirectType } from 'next/navigation'
 
 export default function Navigation({  
     ingredientsConf, 
@@ -32,6 +33,11 @@ export default function Navigation({
         },
         {
             id: 4,
+            name: "แบบสอบถาม",
+            asset: "/navigation/survey.png"
+        },
+        {
+            id: 5,
             name: "ตั้งค่า",
             asset: "/navigation/setting.png"
         }
@@ -58,6 +64,12 @@ export default function Navigation({
                 playerInfoConf.set(!playerInfoConf.get)
                 break;
             case 4:
+                // settingConf.set(!settingConf.get)
+                // alert("ตอนนี้ยังไม่มีแบบสอบถาม!")
+                // router.push("https://docs.google.com/forms/d/e/1FAIpQLSe04wuLn2LHsuqGNZyRmq8IObPzlTKblKYzXV3CP-S85_qcgw/viewform")
+                redirect("https://docs.google.com/forms/d/e/1FAIpQLSe04wuLn2LHsuqGNZyRmq8IObPzlTKblKYzXV3CP-S85_qcgw/viewform", RedirectType.push)
+                break;
+            case 5:
                 settingConf.set(!settingConf.get)
                 break;
             default:
