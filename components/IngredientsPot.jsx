@@ -7,7 +7,7 @@ import { CATEGORIES as categories } from "@/lib/constants";
 
 import { isMotionComponent, motion } from "motion/react";
 import { Trykker } from "next/font/google";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import { BiSolidFoodMenu } from "react-icons/bi";
 import { IoIosClose, IoMdSearch } from "react-icons/io";
@@ -28,6 +28,8 @@ export default function IngredientsPot({
   projectileAnim, // [NEW] Whether to show flying animation
   isMobile,
 }) {
+
+  
 
   ingredients.sort((a, b) => a.name.localeCompare(b.name));
   potIngredientsConf.get.sort((a, b) => a.name.localeCompare(b.name));
@@ -152,11 +154,57 @@ export default function IngredientsPot({
     return () => clearInterval(interval);
   }, [flyingItems.length > 0]);
 
+  // Valid 2-ingredient combinations (meat × vegetable)
+  const COMBI = useMemo(() => {
+    const เนื้อ = {
+      A: "เนื้อไก่",
+      B: "เนื้อหมู",
+      C: "เนื้อปลา",
+      D: "เนื้อวัว",
+    }
+    const อื่นๆ = {
+      1: "แครอท",
+      2: "กระเทียม",
+      3: "พริก",
+      4: "อะโว",
+      5: "งา",
+      6: "บล็อคโคลี",
+      7: "กะหล่ำม่วง",
+      8: "เผือก",
+      9: "มะเขือเทศ",
+      10: "สับปะรด",
+      11: "มะม่วง",
+      12: "ฟักทอง",
+      13: "ตะไคร้",
+      14: "หอมแดง",
+      15: "ตระกูลเบอร์รี่",
+    }
+    const pairs = [];
+    Object.keys(เนื้อ).forEach((key) => {
+      Object.keys(อื่นๆ).forEach((key2) => {
+        pairs.push([เนื้อ[key], อื่นๆ[key2]])
+      })
+    })
+    return pairs;
+  }, []);
+
+  // Check if an ingredient can pair with the current pot contents
+  const isIngredientCompatible = (ingName) => {
+    const potNames = potIngredientsConf.get.map(p => p.name);
+    if (potNames.length === 0) return true; // empty pot = all enabled
+    // For each ingredient already in the pot, check that a COMBI pair exists
+    return potNames.every(potName =>
+      COMBI.some(([a, b]) =>
+        (a === potName && b === ingName) || (b === potName && a === ingName)
+      )
+    );
+  };
+
   // Sprite animation - cycle through 8 frames
   useEffect(() => {
     const spriteInterval = setInterval(() => {
       setSpriteFrame((prev) => (prev + 1) % 8);
-    }, 150); // 150ms per frame = ~6.6 fps
+    }, 150);
     return () => clearInterval(spriteInterval);
   }, []);
 
@@ -237,7 +285,8 @@ export default function IngredientsPot({
         }}
       >
         <div className="flex h-144 max-h-144">
-          <div className={`w-14 border-r-4 h-full border-[#b6562c]/50 duration-100  flex flex-col gap-2 ${isMobile ? "hidden" : ""}`}>
+          <div className={`w-14 border-r-4 h-full border-[#b6562c]/50 duration-100  flex flex-col gap-2 
+            ${isMobile ? "hidden" : ""}`}>
             <div className="w-full h-32 rounded-l-xl"></div>
             { /* GrAppsRounded */ }
             <motion.button
@@ -382,12 +431,12 @@ export default function IngredientsPot({
                         variants={{
                           initial: { scale: 1 },
                         }}
-                        disabled={!!inPot}
+                        disabled={!!inPot || !isIngredientCompatible(ing.name)}
                         className={`
                           flex flex-col justify-center items-center gap-2 py-1! md:py-2!
                           border border-[#b6562c]/20 drop-shadow-2xl bg-[#b6562c]/10
                           cursor-pointer 
-                          ${inPot ? "opacity-60 cursor-not-allowed" : ""}
+                          ${(inPot || !isIngredientCompatible(ing.name)) ? "opacity-60 cursor-not-allowed" : ""}
                         `}
                       >
                         <motion.div

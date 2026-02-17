@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence } from "motion/react";
 import {
@@ -41,6 +42,8 @@ const bagel = Bagel_Fat_One({
 });
 
 export default function Home() {
+  const router = useRouter()
+
   const [playerName, setPlayerName, nameLoaded] = useLocalStorage(
     "playerName",
     null,
@@ -59,6 +62,9 @@ export default function Home() {
     detailsAdded: 0,
     firstDiscoveries: 0,
   });
+
+  // Survey chat bubble
+  const [surveyClicked, setSurveyClicked] = useLocalStorage("surveyClicked", false);
 
   // [NEW] Full collection for achievements (replaces history for counts)
   const [userCollection, setUserCollection] = useState([]);
@@ -485,6 +491,8 @@ export default function Home() {
       <BackgroundVideo onStirRef={stirRef} enabled={dynamicBg} />
       <div className="absolute inset-0 bg-linear-to-b from-[#f29f76] to-transparent to-20%  z-10"></div>
 
+      
+
       <div className="flex flex-col h-full ">
         {/* Header */}
         <div className="bg-linear-to-b dfrom-black z-20 to-transparent w-full flex justify-center md:justify-between gap-2 items-center md:items-start ">
@@ -590,7 +598,30 @@ export default function Home() {
           isMobile={isMobile}
         />
 
-        <Navigation
+        {/* Girl's Speech Bubble */}
+        {!surveyClicked && history.length > 0 && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 1.5, duration: 0.5, type: "spring" }}
+            className="self-center z-20 max-w-fit mb-4!"
+            onClick={() => {
+              setSurveyClicked(true);
+              router.push("https://docs.google.com/forms/d/e/1FAIpQLSe04wuLn2LHsuqGNZyRmq8IObPzlTKblKYzXV3CP-S85_qcgw/viewform");
+            }}
+          >
+            <div className="relative bg-[url('/texture/paper.jpg')] border-2  border-[#b6562c]/50 
+                            p-3! rounded- 2xl shadow-lg text-[#b6562c] text-md md:text-lg font-bold">
+              ช่วยทำแบบสอบถามให้หน่อยนะคะ 😊
+              {/* Speech bubble tail */}
+              {/* <div className="absolute bottom-4 -right-2.5 w-4 h-4 
+                              bg-[url('/texture/paper.jpg')] border-b-2 border-r-2 
+                              border-[#b6562c]/50 -rotate-45" /> */}
+            </div>
+          </motion.button>
+        )}
+
+        <Navigation 
           ingredientsConf={{
             get: showIngredients,
             set: setShowIngredients,
