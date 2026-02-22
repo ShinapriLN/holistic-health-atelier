@@ -161,6 +161,7 @@ export default function IngredientsPot({
       B: "เนื้อหมู",
       C: "เนื้อปลา",
       D: "เนื้อวัว",
+      E: "test_A",
     }
     const อื่นๆ = {
       1: "แคร์รอต",
@@ -178,6 +179,7 @@ export default function IngredientsPot({
       13: "ตะไคร้",
       14: "หอมแดง",
       15: "ตระกูลเบอร์รี่",
+      16: "test_B",
     }
     const pairs = [];
     Object.keys(เนื้อ).forEach((key) => {

@@ -8,7 +8,7 @@ export default function RecipeResult({
   benefits,
   isNewDiscovery,
   onCookAgain,
-  setShowPlayerInfo
+  handleFoodData
 }) {
 
   return (
@@ -60,7 +60,7 @@ export default function RecipeResult({
                 <div className="flex flex-col gap-1 flex-1">
                   <span className="text-[#b6562c] font-bold">{item.name}</span>
                   <span className="text-[#b6562c] text-sm text-wrap leading-relaxed">
-                    {item.benefit}
+                    <pre>{item.benefit}</pre>
                   </span>
                 </div>
               </div>
@@ -75,7 +75,7 @@ export default function RecipeResult({
                         py-4! px-8! text-lg text-[#b6562c] font-semibold
                         transition-all duration-300 cursor-pointer
                         hover:-translate-y-1 hover:shadow-xl hover:shadow-[#b6562c]/30"
-              onClick={() => {onCookAgain(); setShowPlayerInfo(true)}}
+              onClick={() => {onCookAgain(); handleFoodData(recipe)}}
             >
               ข้อมูลโภชนาการ
             </motion.button>

@@ -10,7 +10,7 @@ import { isMobile } from "pixi.js";
 import Image from "next/image";
 
 
-export default function PlayerInfoPanel({ history, player, onClose, ingredients, achievements }) { // [NEW] Accept achievements prop
+export default function PlayerInfoPanel({ history, player, onClose, ingredients, achievements, recipe }) { // [NEW] Accept achievements prop
   const [ currentTab, setCurrentTab ] = useState(0)
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -87,10 +87,10 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
         </div>
         {/* Content */}
         {
-          currentTab == 0 ? <CollectionContent player={player} recipes={recipes} loading={loading} /> : 
+          currentTab == 0 ? <CollectionContent player={player} recipes={recipes} loading={loading} recipe={recipe} /> : 
           currentTab == 1 ? <MaterialContent ingredients={ingredients} player={player} /> :  
           currentTab == 2 ? <AchievementContent achievements={achievements} /> : 
-          <CollectionContent player={player} recipes={recipes} loading={loading} />
+          <CollectionContent player={player} recipes={recipes} loading={loading} recipe={null} />
         }
       </motion.div>
     </div>
@@ -98,14 +98,21 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
 }
 
 
-function CollectionContent({ player, recipes, loading }) {
-  
+function CollectionContent({ player, recipes, loading, recipe }) {
   
   const [currentSelected, setCurrentSelected] = useState(null);
-
   const [mobileTab, setMobileTab] = useState(0)
 
-  
+  // Auto-select the recipe passed from the Result screen
+  useEffect(() => {
+    if (!loading && recipes && recipes.length > 0 && recipe) {
+      const idx = recipes.findIndex(r => r.id === recipe.id);
+      if (idx !== -1) {
+        setCurrentSelected(idx);
+        setMobileTab(recipes[idx].image_url ? "รูปภาพ" : "วัตถุดิบ");
+      }
+    }
+  }, [loading, recipes, recipe]);
 
   if (loading) {
     return <div className="p-4! border-b-4 border-x-4 border-[#b6562c]/50 h-full flex items-center justify-center text-center text-[#b6562c]">กำลังโหลด...</div>;
@@ -116,13 +123,13 @@ function CollectionContent({ player, recipes, loading }) {
       {
         currentSelected === null ? 
         <div  className={`grid-cols-3 md:grid-cols-4 content-start gap-3 overflow-y-auto p-2! relative h-full border-b-4 border-x-4 border-[#b6562c]/50 
-        ${recipes.length === 0 ? "flex items-center justify-center" : "grid"}`}>
-          {recipes.length === 0 && (
+        ${recipes?.length === 0 ? "flex items-center justify-center" : "grid"}`}>
+          {recipes?.length === 0 && (
             <div className="col-span-4 text-center text-[#b6562c]/70 py-10! h-full flex items-center justify-center">
               ยังไม่มีสูตรอาหารที่สะสมไว้
             </div>
           )}
-          {recipes.map((item, index) => (
+          {recipes?.map((item, index) => (
             <motion.button 
               initial={{ scale: 0.98 }}
               whileHover={{ scale: 1 }}

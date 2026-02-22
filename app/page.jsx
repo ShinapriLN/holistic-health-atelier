@@ -423,6 +423,12 @@ export default function Home() {
     setShowPotData(false);
     setPotIngredients([]);
   };
+  const [selectedRecipe, setSelectedRecipe] = useState(null)
+  const handleFoodData = (recipe) => {
+    console.log(recipe)
+    setSelectedRecipe(recipe)
+    setShowPlayerInfo(true)
+  }
 
   const getCombinedBenefits = (ingredientsOverride = null) => {
     const list = ingredientsOverride || potIngredients;
@@ -477,6 +483,8 @@ export default function Home() {
       </div>
     );
   }
+
+
 
   return (
     <div
@@ -671,7 +679,7 @@ export default function Home() {
           benefits={getCombinedBenefits()}
           isNewDiscovery={isNewDiscovery}
           onCookAgain={handleCookAgain}
-          setShowPlayerInfo={setShowPlayerInfo}
+          handleFoodData={handleFoodData}
         />
       )}
       {showHistory && (
@@ -684,6 +692,7 @@ export default function Home() {
           onClose={() => setShowPlayerInfo(false)}
           ingredients={ingredients}
           achievements={achievements}
+          recipe={selectedRecipe}
         />
       )}
       {showSetting && (
