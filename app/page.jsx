@@ -425,7 +425,7 @@ export default function Home() {
   };
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const handleFoodData = (recipe) => {
-    console.log(recipe)
+    // console.log(recipe)
     setSelectedRecipe(recipe)
     setShowPlayerInfo(true)
   }
