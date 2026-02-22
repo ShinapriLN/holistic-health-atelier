@@ -596,7 +596,7 @@ export default function IngredientsPot({
           <div className="p-4!">
             <motion.button
               onClick={handleComplete}
-              disabled={isLoading || potIngredientsConf.get.length <= 0}
+              disabled={isLoading || potIngredientsConf.get.length <= 1}
               whileTap={{ scale: 0.95 }}
               className="
                       h-12 p-3! px-5! justify-self-center flex items-center  disabled:opacity-60
