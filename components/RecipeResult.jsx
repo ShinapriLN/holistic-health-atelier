@@ -8,6 +8,7 @@ export default function RecipeResult({
   benefits,
   isNewDiscovery,
   onCookAgain,
+  setShowPlayerInfo
 }) {
 
   return (
@@ -66,18 +67,31 @@ export default function RecipeResult({
             ))}
           </div>
         </div>
+        <div className="flex justify-center gap-4!">
+            {/* Cook Again Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#b6562c]/10 border-2 border-[#b6562c]/50 w-fit self-center flex
+                        py-4! px-8! text-lg text-[#b6562c] font-semibold
+                        transition-all duration-300 cursor-pointer
+                        hover:-translate-y-1 hover:shadow-xl hover:shadow-[#b6562c]/30"
+              onClick={() => {onCookAgain(); setShowPlayerInfo(true)}}
+            >
+              ข้อมูลโภชนาการ
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#b6562c]/10 border-2 border-[#b6562c]/50 w-fit self-center flex
+                        py-4! px-8! text-lg text-[#b6562c] font-semibold
+                        transition-all duration-300 cursor-pointer
+                        hover:-translate-y-1 hover:shadow-xl hover:shadow-[#b6562c]/30"
+              onClick={onCookAgain}
+            >
+              ตกลง
+            </motion.button>
+        </div>
 
-        {/* Cook Again Button */}
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          className="bg-[#b6562c]/10 border-2 border-[#b6562c]/50 w-fit self-center flex
-                     py-4! px-8! text-lg text-[#b6562c] font-semibold
-                     transition-all duration-300 cursor-pointer
-                     hover:-translate-y-1 hover:shadow-xl hover:shadow-[#b6562c]/30"
-          onClick={onCookAgain}
-        >
-          ตกลง
-        </motion.button>
+        
       </div>
     </div>
   );

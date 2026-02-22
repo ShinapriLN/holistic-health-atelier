@@ -671,6 +671,7 @@ export default function Home() {
           benefits={getCombinedBenefits()}
           isNewDiscovery={isNewDiscovery}
           onCookAgain={handleCookAgain}
+          setShowPlayerInfo={setShowPlayerInfo}
         />
       )}
       {showHistory && (
