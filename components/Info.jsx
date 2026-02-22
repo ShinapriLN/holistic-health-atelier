@@ -280,18 +280,18 @@ function CollectionContent({ player, recipes, loading, recipe }) {
                     <div className=" w-full flex flex-col p-2! gap-2 overflow-y-auto max-h-84 md:max-h-80 ">
                     {
                       recipes[currentSelected].ingredients.map((ing, index) => (
-                        <div key={ing.id || index} className="flex">
-                            <span className="mr-2!">✦</span>
-                            <span className="">
+                        <div key={ing.id || index} className="flex flex-col">
+                            <div className="mr-2! font-bold">✦ {ing.name} : </div>
+                            <pre className="text-wrap ml-8!">
                               {ing.benefit}
-                            </span>
+                            </pre>
                         </div>
                       ))
                     }
                     {recipes[currentSelected].description && (
                       <>
                         <span className="font-bold block mb-1!">ข้อเสนอแนะ</span>
-                        <pre className="text-wrap ">{recipes[currentSelected].description}</pre>
+                        <pre className="text-wrap ml-8!">{recipes[currentSelected].description}</pre>
                       </>
                     )}
                     </div>

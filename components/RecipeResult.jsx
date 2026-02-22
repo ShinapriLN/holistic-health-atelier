@@ -48,20 +48,20 @@ export default function RecipeResult({
                 className="flex gap-4 items-start  border-2 border-[#b6562c]/50 p-4!
                            transition-transform duration-200" 
               >
-                <div className="text-3xl ">
+                <div className="text-3xl shrink-0">
                   <Image 
                     src={item.image_url} 
                     alt={item.name}
                     width={300} 
                     height={300} 
-                    className="w-18 object-contain" 
+                    className="w-18 object-cover " 
                   />
                 </div>
-                <div className="flex flex-col gap-1 flex-1">
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <span className="text-[#b6562c] font-bold">{item.name}</span>
-                  <span className="text-[#b6562c] text-sm text-wrap leading-relaxed">
-                    <pre>{item.benefit}</pre>
-                  </span>
+                  <pre className="text-[#b6562c] text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                    {item.benefit}
+                  </pre>
                 </div>
               </div>
             ))}
