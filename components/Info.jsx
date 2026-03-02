@@ -87,10 +87,10 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
         </div>
         {/* Content */}
         {
-          currentTab == 0 ? <CollectionContent player={player} recipes={recipes} loading={loading} recipe={recipe} /> : 
+          currentTab == 0 ? <CollectionContent player={player} recipes={recipes} loading={loading} recipe={recipe} ingredients={ingredients} /> : 
           currentTab == 1 ? <MaterialContent ingredients={ingredients} player={player} /> :  
           currentTab == 2 ? <AchievementContent achievements={achievements} /> : 
-          <CollectionContent player={player} recipes={recipes} loading={loading} recipe={null} />
+          <CollectionContent player={player} recipes={recipes} loading={loading} recipe={null} ingredients={ingredients} />
         }
       </motion.div>
     </div>
@@ -98,7 +98,7 @@ export default function PlayerInfoPanel({ history, player, onClose, ingredients,
 }
 
 
-function CollectionContent({ player, recipes, loading, recipe }) {
+function CollectionContent({ player, recipes, loading, recipe, ingredients }) {
   
   const [currentSelected, setCurrentSelected] = useState(null);
   const [mobileTab, setMobileTab] = useState(0)
@@ -113,6 +113,12 @@ function CollectionContent({ player, recipes, loading, recipe }) {
       }
     }
   }, [loading, recipes, recipe]);
+
+  // Helper to get real, up-to-date ingredient data
+  const getUpToDateIngredient = (recipeIng) => {
+    // Try to find the ingredient by ID or name in the fresh global ingredients list
+    return ingredients.find(i => i.id === recipeIng.id || i.name === recipeIng.name) || recipeIng;
+  };
 
   if (loading) {
     return <div className="p-4! border-b-4 border-x-4 border-[#b6562c]/50 h-full flex items-center justify-center text-center text-[#b6562c]">กำลังโหลด...</div>;
@@ -176,22 +182,25 @@ function CollectionContent({ player, recipes, loading, recipe }) {
 
               <div className="w-64 flex flex-col p-2! overflow-y-auto h-full">
               {
-                recipes[currentSelected].ingredients.map((ing, index) => (
-                  <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
-                    <div className=" w-fit p-2!">
-                      <Image 
-                        src={ing.image_url} 
-                        alt={ing.name}
-                        width={48} 
-                        height={48} 
-                        className="h-12 w-12 object-contain" 
-                      />
+                recipes[currentSelected].ingredients.map((ingRaw, index) => {
+                  const ing = getUpToDateIngredient(ingRaw);
+                  return (
+                    <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
+                      <div className=" w-fit p-2!">
+                        <Image 
+                          src={ing.image_url} 
+                          alt={ing.name}
+                          width={48} 
+                          height={48} 
+                          className="h-12 w-12 object-contain" 
+                        />
+                      </div>
+                      <div  className=" w-fit">
+                        <span key={ing.id}>{ing.name}</span>
+                      </div>
                     </div>
-                    <div  className=" w-fit">
-                      <span key={ing.id}>{ing.name}</span>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               }
               </div>
             </div>
@@ -205,14 +214,17 @@ function CollectionContent({ player, recipes, loading, recipe }) {
               <div className=" w-full flex flex-col p-2! overflow-y-auto h-full">
                 
                 {
-                  recipes[currentSelected].ingredients.map((ing, index) => (
-                    <div key={ing.id || index} className="flex">
-                        <span className="mr-2!">✦</span>
-                        <span className="">
-                          {ing.benefit}
-                        </span>
-                    </div>
-                  ))
+                  recipes[currentSelected].ingredients.map((ingRaw, index) => {
+                    const ing = getUpToDateIngredient(ingRaw);
+                    return (
+                      <div key={ing.id || index} className="flex">
+                          <span className="mr-2!">✦</span>
+                          <span className="">
+                            {ing.benefit}
+                          </span>
+                      </div>
+                    );
+                  })
                 }
               </div>
               {recipes[currentSelected].description && (
@@ -257,36 +269,42 @@ function CollectionContent({ player, recipes, loading, recipe }) {
                   (mobileTab === "วัตถุดิบ" || mobileTab === 0) ? (
                     <div className="w-full grid grid-cols-2 p-2! overflow-y-auto max-h-84 md:max-h-80">
                     {
-                      recipes[currentSelected].ingredients.map((ing, index) => (
-                        <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
-                          <div className=" w-fit p-2!">
-                            <Image 
-                              src={ing.image_url} 
-                              alt={ing.name}
-                              width={48} 
-                              height={48} 
-                              className="h-12 w-12 object-contain" 
-                            />
+                      recipes[currentSelected].ingredients.map((ingRaw, index) => {
+                        const ing = getUpToDateIngredient(ingRaw);
+                        return (
+                          <div key={ing.id || index} className="flex gap-2 justify-start items-center w-fit">
+                            <div className=" w-fit p-2!">
+                              <Image 
+                                src={ing.image_url} 
+                                alt={ing.name}
+                                width={48} 
+                                height={48} 
+                                className="h-12 w-12 object-contain" 
+                              />
+                            </div>
+                            <div  className=" w-fit">
+                              <span key={ing.id}>{ing.name}</span>
+                            </div>
                           </div>
-                          <div  className=" w-fit">
-                            <span key={ing.id}>{ing.name}</span>
-                          </div>
-                        </div>
-                      ))
+                        );
+                      })
                     }
                   </div>
                   ) : 
                   (mobileTab === "ประโยชน์" || mobileTab === 1) ? (
                     <div className=" w-full flex flex-col p-2! gap-2 overflow-y-auto max-h-84 md:max-h-80 ">
                     {
-                      recipes[currentSelected].ingredients.map((ing, index) => (
-                        <div key={ing.id || index} className="flex flex-col">
-                            <div className="mr-2! font-bold">✦ {ing.name} : </div>
-                            <pre className="text-wrap ml-8!">
-                              {ing.benefit}
-                            </pre>
-                        </div>
-                      ))
+                      recipes[currentSelected].ingredients.map((ingRaw, index) => {
+                        const ing = getUpToDateIngredient(ingRaw);
+                        return (
+                          <div key={ing.id || index} className="flex flex-col gap-1!">
+                              <div className="mr-2! font-bold">✦ {ing.name} : </div>
+                              <pre className="text-wrap ml-8!">
+                                {ing.benefit}
+                              </pre>
+                          </div>
+                        );
+                      })
                     }
                     {recipes[currentSelected].description && (
                       <>
