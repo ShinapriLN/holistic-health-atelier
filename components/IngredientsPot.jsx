@@ -503,7 +503,7 @@ export default function IngredientsPot({
                       </motion.button>
                       <motion.button 
                         whileTap={{ scale: 0.95 }}
-                        disabled={isLoading || potIngredientsConf.get.length <= 0}
+                        disabled={isLoading || potIngredientsConf.get.length <= 1}
                         onClick={handleComplete}
                         className="bg-[#b6562c]/10 text-sm p-2! w-fit h-full border border-[#b6562c]/50 disabled:opacity-60 duration-75">
                         {isLoading ? "เริ่มปรุง..." : "เริ่มปรุง"}
