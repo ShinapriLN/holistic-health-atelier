@@ -155,40 +155,40 @@ export default function IngredientsPot({
   }, [flyingItems.length > 0]);
 
   // Valid 2-ingredient combinations (meat × vegetable)
-  const COMBI = useMemo(() => {
-    const เนื้อ = {
-      A: "เนื้อไก่",
-      B: "เนื้อหมู",
-      C: "เนื้อปลา",
-      D: "เนื้อวัว",
-      E: "test_A",
-    }
-    const อื่นๆ = {
-      1: "แคร์รอต",
-      2: "กระเทียม",
-      3: "พริก",
-      4: "อะโวคาโด",
-      5: "งา",
-      6: "บล็อคโคลี",
-      7: "กะหล่ำปลีม่วง",
-      8: "เผือก",
-      9: "มะเขือเทศ",
-      10: "สับปะรด",
-      11: "มะม่วง",
-      12: "ฟักทอง",
-      13: "ตะไคร้",
-      14: "หอมแดง",
-      15: "ตระกูลเบอร์รี่",
-      16: "test_B",
-    }
-    const pairs = [];
-    Object.keys(เนื้อ).forEach((key) => {
-      Object.keys(อื่นๆ).forEach((key2) => {
-        pairs.push([เนื้อ[key], อื่นๆ[key2]])
-      })
-    })
-    return pairs;
-  }, []);
+  // const COMBI = useMemo(() => {
+  //   const เนื้อ = {
+  //     A: "เนื้อไก่",
+  //     B: "เนื้อหมู",
+  //     C: "เนื้อปลา",
+  //     D: "เนื้อวัว",
+  //     E: "test_A",
+  //   }
+  //   const อื่นๆ = {
+  //     1: "แคร์รอต",
+  //     2: "กระเทียม",
+  //     3: "พริก",
+  //     4: "อะโวคาโด",
+  //     5: "งา",
+  //     6: "บล็อคโคลี",
+  //     7: "กะหล่ำปลีม่วง",
+  //     8: "เผือก",
+  //     9: "มะเขือเทศ",
+  //     10: "สับปะรด",
+  //     11: "มะม่วง",
+  //     12: "ฟักทอง",
+  //     13: "ตะไคร้",
+  //     14: "หอมแดง",
+  //     15: "ตระกูลเบอร์รี่",
+  //     16: "test_B",
+  //   }
+  //   const pairs = [];
+  //   Object.keys(เนื้อ).forEach((key) => {
+  //     Object.keys(อื่นๆ).forEach((key2) => {
+  //       pairs.push([เนื้อ[key], อื่นๆ[key2]])
+  //     })
+  //   })
+  //   return pairs;
+  // }, []);
 
   // Check if an ingredient can pair with the current pot contents (including flying items)
   const isIngredientCompatible = (ingName) => {
@@ -435,12 +435,12 @@ export default function IngredientsPot({
                         variants={{
                           initial: { scale: 1 },
                         }}
-                        disabled={!!inPot || !isIngredientCompatible(ing.name)}
+                        disabled={!!inPot}
                         className={`
                           flex flex-col justify-center items-center gap-2 py-1! md:py-2!
                           border border-[#b6562c]/20 drop-shadow-2xl bg-[#b6562c]/10
                           cursor-pointer 
-                          ${(inPot || !isIngredientCompatible(ing.name)) ? "opacity-60 cursor-not-allowed" : ""}
+                          ${(inPot) ? "opacity-60 cursor-not-allowed" : ""}
                         `}
                       >
                         <motion.div
@@ -596,7 +596,7 @@ export default function IngredientsPot({
           <div className="p-4!">
             <motion.button
               onClick={handleComplete}
-              disabled={isLoading || potIngredientsConf.get.length <= 1}
+              disabled={isLoading || potIngredientsConf.get.length <= 0}
               whileTap={{ scale: 0.95 }}
               className="
                       h-12 p-3! px-5! justify-self-center flex items-center  disabled:opacity-60
